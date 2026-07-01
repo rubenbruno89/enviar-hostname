@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Hostname</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 26px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        
+        .topic-section {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+            text-align: left;
+        }
+        
+        .topic-section .info-label {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .topic-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .topic-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .topic-input:focus {
+            outline: none;
+            border-color: #ffc107;
+        }
+        
+        .save-topic-btn {
+            background: #ffc107;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+        
+        .save-topic-btn:hover {
+            background: #e0a800;
+        }
+        
+        .current-topic {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #856404;
+            font-weight: 600;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            text-align: left;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            color: #333;
+            word-break: break-all;
+            margin-bottom: 15px;
+        }
+        
+        .info-value:last-child {
+            margin-bottom: 0;
+        }
+        
+        .hostname-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        
+        .hostname-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            width: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+            text-align: left;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+        }
+        
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 90%;
+            max-width: 400px;
+            pointer-events: none;
+        }
+        
+        .toast {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideDown 0.4s ease-out, fadeOut 0.4s ease-out 3s forwards;
+            pointer-events: auto;
+            margin-bottom: 10px;
+        }
+        
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+        
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .toast-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .toast-content {
+            flex: 1;
+        }
+        
+        .toast-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        
+        .toast-message {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <div class="container">
+        <h1>🖥️ Enviar Hostname</h1>
+        <p class="subtitle">Envie informações do dispositivo para o ntfy.sh</p>
+        
+        <div class="topic-section">
+            <div class="info-label">📡 Tópico ntfy.sh</div>
+            <div class="topic-input-group">
+                <input 
+                    type="text" 
+                    id="topicInput" 
+                    class="topic-input" 
+                    placeholder="Digite o tópico..."
+                    value="vixti"
+                >
+                <button class="save-topic-btn" onclick="saveTopic()">
+                    Salvar
+                </button>
+            </div>
+            <div class="current-topic" id="currentTopic">
+                Tópico atual: <strong>vixti</strong>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <div class="info-label">Informações do Dispositivo</div>
+            <div class="info-value">
+                <strong>Plataforma:</strong> <span id="platform">Detectando...</span>
+            </div>
+            <div class="info-value">
+                <strong>Navegador:</strong> <span id="browser">Detectando...</span>
+            </div>
+            <div class="info-value">
+                <strong>Idioma:</strong> <span id="language">Detectando...</span>
+            </div>
+            <div class="info-value">
+                <strong>Resolução:</strong> <span id="resolution">Detectando...</span>
+            </div>
+        </div>
+        
+        <div class="info-label">Hostname / Identificador</div>
+        <input 
+            type="text" 
+            id="hostnameInput" 
+            class="hostname-input" 
+            placeholder="Digite o hostname ou identificador..."
+        >
+        
+        <button id="sendBtn" onclick="sendHostname()">
+            Enviar para ntfy.sh
+        </button>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="footer" id="footer">
+            Envia para: https://ntfy.sh/vixti
+        </div>
+    </div>
+
+    <script>
+        // Carregar tópico salvo
+        function loadTopic() {
+            const savedTopic = localStorage.getItem('ntfy_topic') || 'vixti';
+            document.getElementById('topicInput').value = savedTopic;
+            updateCurrentTopic(savedTopic);
+        }
+        
+        // Salvar tópico
+        function saveTopic() {
+            const topic = document.getElementById('topicInput').value.trim();
+            
+            if (!topic) {
+                showToast('Erro', 'Digite um tópico válido', 'error');
+                return;
+            }
+            
+            // Validar tópico (apenas letras, números, hífens e underlines)
+            if (!/^[a-zA-Z0-9_-]+$/.test(topic)) {
+                showToast('Erro', 'Tópico inválido. Use apenas letras, números, hífens e underlines', 'error');
+                return;
+            }
+            
+            localStorage.setItem('ntfy_topic', topic);
+            updateCurrentTopic(topic);
+            showToast('Tópico Salvo!', `Notificações serão enviadas para: ${topic}`, 'success');
+        }
+        
+        // Atualizar exibição do tópico atual
+        function updateCurrentTopic(topic) {
+            document.getElementById('currentTopic').innerHTML = `Tópico atual: <strong>${topic}</strong>`;
+            document.getElementById('footer').textContent = `Envia para: https://ntfy.sh/${topic}`;
+        }
+        
+        // Obter tópico atual
+        function getCurrentTopic() {
+            return document.getElementById('topicInput').value.trim() || 'vixti';
+        }
+        
+        // Detectar informações do dispositivo
+        function detectDeviceInfo() {
+            // Plataforma
+            const platform = navigator.platform || navigator.userAgent || 'Desconhecido';
+            document.getElementById('platform').textContent = platform;
+            
+            // Browser
+            const userAgent = navigator.userAgent;
+            let browser = 'Desconhecido';
+            if (userAgent.indexOf('Chrome') > -1 && userAgent.indexOf('Edg') === -1) browser = 'Chrome';
+            else if (userAgent.indexOf('Safari') > -1 && userAgent.indexOf('Chrome') === -1) browser = 'Safari';
+            else if (userAgent.indexOf('Firefox') > -1) browser = 'Firefox';
+            else if (userAgent.indexOf('Edg') > -1) browser = 'Edge';
+            else if (userAgent.indexOf('OPR') > -1 || userAgent.indexOf('Opera') > -1) browser = 'Opera';
+            document.getElementById('browser').textContent = browser;
+            
+            // Idioma
+            const language = navigator.language || navigator.userLanguage || 'Desconhecido';
+            document.getElementById('language').textContent = language;
+            
+            // Resolução
+            const resolution = `${window.screen.width}x${window.screen.height}`;
+            document.getElementById('resolution').textContent = resolution;
+            
+            // Gerar hostname sugerido
+            const suggestedHostname = `${platform}-${browser}-${Date.now().toString(36)}`.substring(0, 30);
+            document.getElementById('hostnameInput').value = suggestedHostname;
+        }
+        
+        // Mostrar notificação toast
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? '✅' : '❌';
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${icon}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Remove após 3.4 segundos
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 3400);
+        }
+        
+        async function sendHostname() {
+            const btn = document.getElementById('sendBtn');
+            const status = document.getElementById('status');
+            const hostname = document.getElementById('hostnameInput').value.trim();
+            const topic = getCurrentTopic();
+            
+            if (!hostname) {
+                status.textContent = '❌ Por favor, digite um hostname ou identificador';
+                status.className = 'status error';
+                showToast('Erro', 'Digite um hostname ou identificador', 'error');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Enviando...';
+            status.className = 'status';
+            status.style.display = 'none';
+            
+            try {
+                // Coletar todas as informações
+                const platform = document.getElementById('platform').textContent;
+                const browser = document.getElementById('browser').textContent;
+                const language = document.getElementById('language').textContent;
+                const resolution = document.getElementById('resolution').textContent;
+                
+                const message = `🖥️ Novo dispositivo registrado!
+                
+📋 Hostname: ${hostname}
+💻 Plataforma: ${platform}
+🌐 Navegador: ${browser}
+🌍 Idioma: ${language}
+📐 Resolução: ${resolution}
+📅 Data/Hora: ${new Date().toLocaleString('pt-BR')}`;
+                
+                // Enviar para ntfy.sh com o tópico escolhido
+                const response = await fetch(`https://ntfy.sh/${topic}`, {
+                    method: 'POST',
+                    body: message,
+                    headers: {
+                        'Title': 'Novo Dispositivo Registrado',
+                        'Priority': 'default',
+                        'Tags': 'computer'
+                    }
+                });
+                
+                if (response.ok) {
+                    status.textContent = `✅ Enviado com sucesso para o tópico "${topic}"! Hostname: ${hostname}`;
+                    status.className = 'status success';
+                    showToast('Hostname Enviado!', `${hostname} enviado para o tópico: ${topic}`, 'success');
+                } else {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+            } catch (error) {
+                status.textContent = `❌ Erro ao enviar: ${error.message}`;
+                status.className = 'status error';
+                showToast('Erro ao Enviar', error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Enviar para ntfy.sh';
+            }
+        }
+        
+        // Inicializar
+        loadTopic();
+        detectDeviceInfo();
+    </script>
+</body>
+</html>
